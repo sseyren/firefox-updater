@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+
+FIREFOX_SETUP_DIR=/opt
+FIREFOX_DOWNLOAD_URL='https://download.mozilla.org/?product=firefox-latest-ssl&os=linux64&lang=tr'
+
+if [ $EUID != 0 ]; then
+    echo Bu betik çalışabilmesi için \"root\" yetkilerine ihtiyaç duyar.
+    exit 1
+fi
+
+echo Sunucudan en son sürüm kontrol ediliyor...
+LASTEST_FIREFOX_VERSION=`curl -s -D - "$FIREFOX_DOWNLOAD_URL" -o /dev/null | grep "Location:"`
+
+if [ $? != 0 ]; then
+    echo "Sunucudan son sürüm bilgisi alınamadı. ($FIREFOX_DOWNLOAD_URL)"
+    exit 1
+fi
+
+LASTEST_FIREFOX_VERSION=`echo $LASTEST_FIREFOX_VERSION | cut -d '/' -f7`
+echo En son Firefox sürümü: $LASTEST_FIREFOX_VERSION
+
+LOGNAME=`logname`
+CURRENT_FIREFOX_VERSION=`su $LOGNAME -c "${FIREFOX_SETUP_DIR}/firefox/firefox -v"`
+
+if [ $? != 0 ]; then
+    echo $FIREFOX_SETUP_DIR dizini altında firefox bulunamadı.
+    echo -n $FIREFOX_SETUP_DIR dizinine kurmak ister misiniz? [E/h]" "
+else
+    CURRENT_FIREFOX_VERSION=`echo $CURRENT_FIREFOX_VERSION | cut -d ' ' -f3`
+    echo Mevcut Firefox sürümü: $CURRENT_FIREFOX_VERSION
+
+    if [ $LASTEST_FIREFOX_VERSION == $CURRENT_FIREFOX_VERSION ]; then
+        echo Tebrikler! En son Firefox sürümünü kullanmaktasınız.
+        exit 0
+    fi
+
+    echo Görünüşe göre eski bir Firefox sürümü kullanmaktasınız.
+    echo -n Güncelleme yapmak istediğinizden emin misiniz? [E/h]" "
+fi
+
+read CHOICE
+
+if [ -n $CHOICE -a $CHOICE != 'e' -a $CHOICE != 'E' ]; then
+    echo Güncelleme yapılmadan çıkıldı.
+    exit 0
+fi
+
+echo En son Firefox sürümü indiriliyor...
+wget -O /tmp/firefox.tar.bz2 $FIREFOX_DOWNLOAD_URL
+
+if [ $? != 0 ]; then
+    echo "Sunucudan indirme sırasında bir hata oluştu."
+    exit 1
+fi
+
+echo Arşiv çıkartılıyor...
+tar xjf /tmp/firefox.tar.bz2 -C /tmp/
+
+echo Kopyalama işlemleri gerçekleştiriliyor...
+rm -rf ${FIREFOX_SETUP_DIR}/firefox
+
+if [ $? != 0 ]; then
+    echo "Eski Firefox sürümü silinirken bir hata ile karşılaşıldı."
+    exit 1
+fi
+
+cp -r /tmp/firefox $FIREFOX_SETUP_DIR
+
+if [ $? != 0 ]; then
+    echo "Yeni Firefox sürümü kopyalanırken bir hata ile karşılaşıldı."
+    exit 1
+fi
+
+echo Güncelleme işlemi başarıyla tamamlandı.
+exit 0

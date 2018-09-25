@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 FIREFOX_SETUP_DIR=/opt
+FIREFOX_DESKTOP_ENTRY_DIR=/usr/share/applications
 FIREFOX_DOWNLOAD_URL='https://download.mozilla.org/?product=firefox-latest-ssl&os=linux64&lang=tr'
 
 if [ $EUID != 0 ]; then
@@ -69,6 +70,13 @@ cp -r /tmp/firefox $FIREFOX_SETUP_DIR
 if [ $? != 0 ]; then
     echo "Yeni Firefox sürümü kopyalanırken bir hata ile karşılaşıldı."
     exit 1
+fi
+
+echo Başlatıcı ikonu ekleniyor...
+ln -s /usr/local/share/firefox-update/firefox.desktop $FIREFOX_DESKTOP_ENTRY_DIR
+
+if [ $? != 0 ]; then
+    echo "Sembolik link oluşturulurken bir hata ile karşılaşıldı."
 fi
 
 echo Güncelleme işlemi başarıyla tamamlandı.

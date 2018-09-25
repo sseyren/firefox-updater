@@ -73,7 +73,7 @@ if [ $? != 0 ]; then
 fi
 
 echo Başlatıcı ikonu ekleniyor...
-ln -s /usr/local/share/firefox-update/firefox.desktop $FIREFOX_DESKTOP_ENTRY_DIR
+cp /usr/local/share/firefox-update/firefox.desktop $FIREFOX_DESKTOP_ENTRY_DIR
 
 if [ $? != 0 ]; then
     echo "Sembolik link oluşturulurken bir hata ile karşılaşıldı."

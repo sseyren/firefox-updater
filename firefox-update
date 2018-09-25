@@ -4,6 +4,11 @@ FIREFOX_SETUP_DIR=/opt
 FIREFOX_DESKTOP_ENTRY_DIR=/usr/share/applications
 FIREFOX_DOWNLOAD_URL='https://download.mozilla.org/?product=firefox-latest-ssl&os=linux64&lang=tr'
 
+copydesktopfile()
+{
+    cp /usr/local/share/firefox-update/firefox.desktop $FIREFOX_DESKTOP_ENTRY_DIR
+}
+
 if [ $EUID != 0 ]; then
     echo Bu betik çalışabilmesi için \"root\" yetkilerine ihtiyaç duyar.
     exit 1
@@ -32,6 +37,10 @@ else
 
     if [ $LASTEST_FIREFOX_VERSION == $CURRENT_FIREFOX_VERSION ]; then
         echo Tebrikler! En son Firefox sürümünü kullanmaktasınız.
+        if [ ! -f $FIREFOX_DESKTOP_ENTRY_DIR/firefox.desktop ]; then
+             copydesktopfile
+             echo Bozuk başlatıcı onarıldı.
+        fi
         exit 0
     fi
 
@@ -73,7 +82,7 @@ if [ $? != 0 ]; then
 fi
 
 echo Başlatıcı ikonu ekleniyor...
-cp /usr/local/share/firefox-update/firefox.desktop $FIREFOX_DESKTOP_ENTRY_DIR
+copydesktopfile
 
 if [ $? != 0 ]; then
     echo "Sembolik link oluşturulurken bir hata ile karşılaşıldı."

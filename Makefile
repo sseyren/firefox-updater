@@ -1,8 +1,7 @@
 WORKING_DIR=.
-ENV_BASH=/usr/bin/env bash
 
 update:
-	${ENV_BASH} ${WORKING_DIR}/firefox-update
+	${WORKING_DIR}/firefox-update
 
 install:
 	cp ${WORKING_DIR}/firefox-update /usr/local/bin/

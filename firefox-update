@@ -84,6 +84,11 @@ fi
 echo Arşiv çıkartılıyor...
 tar xjf /tmp/firefox.tar.bz2 -C /tmp/
 
+if [ $? != 0 ]; then
+    echo "Arşivden çıkarma esnasında bir hata oluştu."
+    exit 1
+fi
+
 echo Kopyalama işlemleri gerçekleştiriliyor...
 rm -rf ${FIREFOX_SETUP_DIR}/firefox
 

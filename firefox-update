@@ -2,11 +2,31 @@
 
 FIREFOX_SETUP_DIR=/opt
 FIREFOX_DESKTOP_ENTRY_DIR=/usr/share/applications
+FIREFOX_BINARY_PATH=/usr/bin/firefox
 FIREFOX_DOWNLOAD_URL='https://download.mozilla.org/?product=firefox-latest-ssl&os=linux64&lang=tr'
 
 copydesktopfile()
 {
-    cp /usr/local/share/firefox-update/firefox.desktop $FIREFOX_DESKTOP_ENTRY_DIR
+    if [ ! -f $FIREFOX_DESKTOP_ENTRY_DIR/firefox.desktop ]; then
+        cp /usr/local/share/firefox-update/firefox.desktop $FIREFOX_DESKTOP_ENTRY_DIR
+        if [ $? != 0 ]; then
+            echo Başlatıcı eklenemedi. "( $FIREFOX_DESKTOP_ENTRY_DIR )"
+        else
+            echo Başlatıcı eklendi. "( $FIREFOX_DESKTOP_ENTRY_DIR )"
+        fi
+    fi
+}
+
+linkbinary()
+{
+    if ! test -L $FIREFOX_BINARY_PATH; then
+        ln -s $FIREFOX_SETUP_DIR/firefox/firefox $FIREFOX_BINARY_PATH
+        if [ $? != 0 ]; then
+            echo İkili dosya, dosya sistemine linklenemedi. "( $FIREFOX_BINARY_PATH )"
+        else
+            echo İkili dosya, dosya sistemine linklendi. "( $FIREFOX_BINARY_PATH )"
+        fi
+    fi
 }
 
 if [ $EUID != 0 ]; then
@@ -37,10 +57,8 @@ else
 
     if [ $LASTEST_FIREFOX_VERSION == $CURRENT_FIREFOX_VERSION ]; then
         echo Tebrikler! En son Firefox sürümünü kullanmaktasınız.
-        if [ ! -f $FIREFOX_DESKTOP_ENTRY_DIR/firefox.desktop ]; then
-             copydesktopfile
-             echo Bozuk başlatıcı onarıldı.
-        fi
+        copydesktopfile
+        linkbinary
         exit 0
     fi
 
@@ -81,12 +99,8 @@ if [ $? != 0 ]; then
     exit 1
 fi
 
-echo Başlatıcı ikonu ekleniyor...
 copydesktopfile
-
-if [ $? != 0 ]; then
-    echo "Sembolik link oluşturulurken bir hata ile karşılaşıldı."
-fi
+linkbinary
 
 echo Güncelleme işlemi başarıyla tamamlandı.
 exit 0

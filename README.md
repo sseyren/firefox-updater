@@ -20,7 +20,7 @@ sudo ./firefox-update
 ```
 
 ```shell
-./firefox-update --help  # veya -hs
+./firefox-update --help  # veya -h
 # yazdığınızda komutla ilgili detaylı bilgi alabilirsiniz
 
 $ ./firefox-update --help
@@ -34,7 +34,7 @@ Paket yönetim sistemi olmadan Firefox web tarayıcısını sisteme kurar.
 ```
 
 ## Betiği Sisteme Kurma / Kaldırma
-Firefox'u kurabilmek/kaldırabilmek için sisteme kurmak zorunda değilsiniz fakat eğer isterseniz:
+Firefox'u kurabilmek/kaldırabilmek için betiği sisteme kurmak zorunda değilsiniz fakat eğer isterseniz:
 
 ```shell
 # Betiği sisteme kurmak için:

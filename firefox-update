@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+if [ $EUID != 0 ]; then
+    echo Bu betik çalışabilmesi için \"root\" yetkilerine ihtiyaç duyar.
+    exit 1
+fi
+
 FIREFOX_SETUP_DIR=/opt/firefox
 FIREFOX_DESKTOP_ENTRY_DIR=/usr/share/applications
 FIREFOX_BINARY_PATH=/usr/bin/firefox
@@ -66,11 +71,6 @@ promptbinary()
         linkbinary
     fi
 }
-
-if [ $EUID != 0 ]; then
-    echo Bu betik çalışabilmesi için \"root\" yetkilerine ihtiyaç duyar.
-    exit 1
-fi
 
 echo Sunucudan en son sürüm kontrol ediliyor...
 LASTEST_FIREFOX_VERSION=`curl -s -D - "$FIREFOX_DOWNLOAD_URL" -o /dev/null | grep "Location:"`

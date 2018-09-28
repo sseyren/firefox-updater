@@ -1,10 +1,5 @@
 #!/usr/bin/env bash
 
-if [ $EUID != 0 ]; then
-    echo Bu betik çalışabilmesi için \"root\" yetkilerine ihtiyaç duyar.
-    exit 1
-fi
-
 FIREFOX_SETUP_DIR=/opt/firefox
 FIREFOX_DESKTOP_ENTRY_DIR=/usr/share/applications
 FIREFOX_BINARY_PATH=/usr/bin/firefox
@@ -21,6 +16,14 @@ if [ -e /usr/local/share/firefox-update/ ]; then
 else
     FIREFOX_UPDATE_DIR=.
 fi
+
+rootcheck()
+{
+    if [ $EUID != 0 ]; then
+        echo Bu operasyon \"root\" yetkilerine ihtiyaç duyar.
+        exit 1
+    fi
+}
 
 copydesktopfile()
 {
@@ -71,6 +74,54 @@ promptbinary()
         linkbinary
     fi
 }
+
+case $1 in
+    --uninstall|-u|--remove|-r)
+        rootcheck
+        
+        echo Firefox\'un kurulu olduğu dizin siliniyor...
+        rm -rf $FIREFOX_SETUP_DIR
+
+        echo Başlatıcı ve ikili dosya linki siliniyor...
+        rm -rf $FIREFOX_DESKTOP_ENTRY_DIR/firefox.desktop $FIREFOX_BINARY_PATH
+
+        echo -n .mozilla/firefox dizinini silmek ister misiniz? [e/H]" "; read $CHOICE
+        case $CHOICE in
+            [Ee])
+                rm -rf .mozilla/firefox
+                echo .mozilla/firefox dizini silindi.
+            ;;
+        esac
+
+        echo -n .cache/mozilla/firefox dizinini silmek ister misiniz [e/H]" "; read $CHOICE
+        case $CHOICE in
+            [Ee])
+                rm -rf .cache/mozilla/firefox
+                echo .cache/mozilla/firefox dizini silindi.
+            ;;
+        esac
+
+        exit 0
+    ;;
+    --help|-h)
+        echo Kullanım: firefox-update [SEÇENEK]
+        echo Paket yönetim sistemi olmadan Firefox web tarayıcısını sisteme kurar.
+        echo \(Hiç seçenek verilmezse doğrudan kuruluma başlar\)
+        echo
+        echo --install, -i"                       "Firefox\'u indirir ve kurar \(varsayılan\)
+        echo --uninstall, -u, --remove, -r"       "Kurulu olan Firefox\'u kaldırır.
+        echo --help, -h"                          "Bu sayfayı çıktılar
+        exit 0
+    ;;
+    --install|-i|'')
+        rootcheck
+    ;;
+    *)
+        echo Geçersiz parametre -- \'${1}\'
+        echo Daha fazla bilgi için \'cp --help\' kullanın.
+        exit 2
+    ;;
+esac
 
 echo Sunucudan en son sürüm kontrol ediliyor...
 LASTEST_FIREFOX_VERSION=`curl -s -D - "$FIREFOX_DOWNLOAD_URL" -o /dev/null | grep "Location:"`

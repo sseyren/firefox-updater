@@ -75,6 +75,19 @@ promptbinary()
     fi
 }
 
+promptalternative()
+{
+    echo -n Varsayılan tarayıcınız Firefox olarak ayarlansın mı? [E/h]" "
+    read CHOICE
+    case $CHOICE in
+        [Ee]|'')
+            update-alternatives --install /usr/bin/x-www-browser x-www-browser ${FIREFOX_SETUP_DIR}/firefox 200
+            update-alternatives --set x-www-browser ${FIREFOX_SETUP_DIR}/firefox
+            echo Varsayılan tarayıcı Firefox olarak belirlendi.
+        ;;
+    esac
+}
+
 case $1 in
     --uninstall|-u|--remove|-r)
         rootcheck
@@ -84,6 +97,9 @@ case $1 in
 
         echo Başlatıcı ve ikili dosya linki siliniyor...
         rm -rf $FIREFOX_DESKTOP_ENTRY_DIR/firefox.desktop $FIREFOX_BINARY_PATH
+
+        echo Tarayıcı alternatifleri arasından Firefox kaldırılıyor...
+        update-alternatives --remove x-www-browser ${FIREFOX_SETUP_DIR}/firefox
 
         echo -n .mozilla/firefox dizinini silmek ister misiniz? [e/H]" "; read $CHOICE
         case $CHOICE in
@@ -148,6 +164,7 @@ else
         echo Tebrikler! En son Firefox sürümünü kullanmaktasınız.
         promptdesktopfile
         promptbinary
+        promptalternative
         exit 0
     fi
 
@@ -196,6 +213,7 @@ fi
 
 promptdesktopfile
 promptbinary
+promptalternative
 
 echo Güncelleme işlemi başarıyla tamamlandı.
 exit 0

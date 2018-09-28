@@ -38,13 +38,26 @@ promptdesktopfile()
 
 linkbinary()
 {
-    if ! test -L $FIREFOX_BINARY_PATH; then
-        ln -s $FIREFOX_SETUP_DIR/firefox $FIREFOX_BINARY_PATH
-        if [ $? != 0 ]; then
-            echo İkili dosya, dosya sistemine linklenemedi. "( $FIREFOX_BINARY_PATH )"
-        else
-            echo İkili dosya, dosya sistemine linklendi. "( $FIREFOX_BINARY_PATH )"
-        fi
+    rm -rf $FIREFOX_BINARY_PATH
+    ln -s $FIREFOX_SETUP_DIR/firefox $FIREFOX_BINARY_PATH
+    if [ $? != 0 ]; then
+        echo İkili dosya, dosya sistemine linklenemedi.
+    else
+        echo İkili dosya, dosya sistemine linklendi.
+    fi
+}
+
+promptbinary()
+{
+    if [ -e $FIREFOX_BINARY_PATH ]; then
+        echo İkili dosyanın olması gerektiği yerde zaten bir dosya var. "( ${FIREFOX_BINARY_PATH} )"
+        echo -n Üstüne yazmak ister misiniz? [E/h]" "
+        read CHOICE
+        case $CHOICE in
+            [Ee]|'') linkbinary ;;
+        esac
+    else
+        linkbinary
     fi
 }
 
@@ -77,7 +90,7 @@ else
     if [ $LASTEST_FIREFOX_VERSION == $CURRENT_FIREFOX_VERSION ]; then
         echo Tebrikler! En son Firefox sürümünü kullanmaktasınız.
         promptdesktopfile
-        linkbinary
+        promptbinary
         exit 0
     fi
 
@@ -125,7 +138,7 @@ if [ $? != 0 ]; then
 fi
 
 promptdesktopfile
-linkbinary
+promptbinary
 
 echo Güncelleme işlemi başarıyla tamamlandı.
 exit 0

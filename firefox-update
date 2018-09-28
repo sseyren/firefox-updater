@@ -3,7 +3,13 @@
 FIREFOX_SETUP_DIR=/opt
 FIREFOX_DESKTOP_ENTRY_DIR=/usr/share/applications
 FIREFOX_BINARY_PATH=/usr/bin/firefox
-FIREFOX_DOWNLOAD_URL='https://download.mozilla.org/?product=firefox-latest-ssl&os=linux64&lang=tr'
+FIREFOX_ARCH='linux'
+
+if [ `uname -m` == 'x86_64' ]; then
+    FIREFOX_ARCH='linux64'
+fi
+
+FIREFOX_DOWNLOAD_URL="https://download.mozilla.org/?product=firefox-latest-ssl&os=${FIREFOX_ARCH}&lang=tr"
 
 copydesktopfile()
 {

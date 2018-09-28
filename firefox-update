@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-FIREFOX_SETUP_DIR=/opt
+FIREFOX_SETUP_DIR=/opt/firefox
 FIREFOX_DESKTOP_ENTRY_DIR=/usr/share/applications
 FIREFOX_BINARY_PATH=/usr/bin/firefox
 FIREFOX_ARCH='linux'
@@ -26,7 +26,7 @@ copydesktopfile()
 linkbinary()
 {
     if ! test -L $FIREFOX_BINARY_PATH; then
-        ln -s $FIREFOX_SETUP_DIR/firefox/firefox $FIREFOX_BINARY_PATH
+        ln -s $FIREFOX_SETUP_DIR/firefox $FIREFOX_BINARY_PATH
         if [ $? != 0 ]; then
             echo İkili dosya, dosya sistemine linklenemedi. "( $FIREFOX_BINARY_PATH )"
         else
@@ -52,7 +52,7 @@ LASTEST_FIREFOX_VERSION=`echo $LASTEST_FIREFOX_VERSION | cut -d '/' -f7`
 echo En son Firefox sürümü: $LASTEST_FIREFOX_VERSION
 
 LOGNAME=`logname`
-CURRENT_FIREFOX_VERSION=`su $LOGNAME -c "${FIREFOX_SETUP_DIR}/firefox/firefox -v"`
+CURRENT_FIREFOX_VERSION=`su $LOGNAME -c "${FIREFOX_SETUP_DIR}/firefox -v"`
 
 if [ $? != 0 ]; then
     echo $FIREFOX_SETUP_DIR dizini altında firefox bulunamadı.
@@ -96,7 +96,7 @@ if [ $? != 0 ]; then
 fi
 
 echo Kopyalama işlemleri gerçekleştiriliyor...
-rm -rf ${FIREFOX_SETUP_DIR}/firefox
+rm -rf ${FIREFOX_SETUP_DIR}
 
 if [ $? != 0 ]; then
     echo "Eski Firefox sürümü silinirken bir hata ile karşılaşıldı."

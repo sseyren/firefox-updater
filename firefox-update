@@ -11,10 +11,16 @@ fi
 
 FIREFOX_DOWNLOAD_URL="https://download.mozilla.org/?product=firefox-latest-ssl&os=${FIREFOX_ARCH}&lang=tr"
 
+if [ -e /usr/local/share/firefox-update/ ]; then
+        FIREFOX_UPDATE_DIR=/usr/local/share/firefox-update
+else
+        FIREFOX_UPDATE_DIR=.
+fi
+
 copydesktopfile()
 {
     rm -rf ${FIREFOX_DESKTOP_ENTRY_DIR}/firefox.desktop
-    cp /usr/local/share/firefox-update/firefox.desktop ${FIREFOX_DESKTOP_ENTRY_DIR}/firefox.desktop
+    cp ${FIREFOX_UPDATE_DIR}/firefox.desktop ${FIREFOX_DESKTOP_ENTRY_DIR}/firefox.desktop
         if [ $? != 0 ]; then
             echo Başlatıcı eklenemedi.
         else

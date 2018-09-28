@@ -13,13 +13,26 @@ FIREFOX_DOWNLOAD_URL="https://download.mozilla.org/?product=firefox-latest-ssl&o
 
 copydesktopfile()
 {
-    if [ ! -f $FIREFOX_DESKTOP_ENTRY_DIR/firefox.desktop ]; then
-        cp /usr/local/share/firefox-update/firefox.desktop $FIREFOX_DESKTOP_ENTRY_DIR
+    rm -rf ${FIREFOX_DESKTOP_ENTRY_DIR}/firefox.desktop
+    cp /usr/local/share/firefox-update/firefox.desktop ${FIREFOX_DESKTOP_ENTRY_DIR}/firefox.desktop
         if [ $? != 0 ]; then
-            echo Başlatıcı eklenemedi. "( $FIREFOX_DESKTOP_ENTRY_DIR )"
+            echo Başlatıcı eklenemedi.
         else
-            echo Başlatıcı eklendi. "( $FIREFOX_DESKTOP_ENTRY_DIR )"
+            echo Başlatıcı eklendi.
         fi
+}
+
+promptdesktopfile()
+{
+    if [ -e $FIREFOX_DESKTOP_ENTRY_DIR/firefox.desktop ]; then
+        echo Başlatıcının olması gereken yerde zaten bir dosya var. "( ${FIREFOX_DESKTOP_ENTRY_DIR}/firefox.desktop )"
+        echo -n Üstüne yazmak ister misiniz? [E/h]" "
+        read CHOICE
+        case $CHOICE in
+            [Ee]|'') copydesktopfile ;;
+        esac
+    else
+        copydesktopfile
     fi
 }
 
@@ -63,7 +76,7 @@ else
 
     if [ $LASTEST_FIREFOX_VERSION == $CURRENT_FIREFOX_VERSION ]; then
         echo Tebrikler! En son Firefox sürümünü kullanmaktasınız.
-        copydesktopfile
+        promptdesktopfile
         linkbinary
         exit 0
     fi
@@ -73,11 +86,12 @@ else
 fi
 
 read CHOICE
-
-if [ -n $CHOICE -a $CHOICE != 'e' -a $CHOICE != 'E' ]; then
+case $CHOICE in
+    [hH])
     echo Güncelleme yapılmadan çıkıldı.
     exit 0
-fi
+    ;;
+esac
 
 echo En son Firefox sürümü indiriliyor...
 wget -O /tmp/firefox.tar.bz2 $FIREFOX_DOWNLOAD_URL
@@ -110,7 +124,7 @@ if [ $? != 0 ]; then
     exit 1
 fi
 
-copydesktopfile
+promptdesktopfile
 linkbinary
 
 echo Güncelleme işlemi başarıyla tamamlandı.

@@ -3,7 +3,7 @@ WORKING_DIR=.
 update:
 	${WORKING_DIR}/firefox-update
 
-install:
+install: uninstall
 	cp ${WORKING_DIR}/firefox-update /usr/local/bin/
 	mkdir /usr/local/share/firefox-update
 	cp ${WORKING_DIR}/firefox.desktop /usr/local/share/firefox-update
